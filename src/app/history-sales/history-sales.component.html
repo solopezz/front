@@ -1,0 +1,112 @@
+<div class="card">
+	<h6 class="card-header">
+		<div class="row" style="justify-content: flex-end;">
+			<div class="form-group col-lg-4 col-md-6 col-sm-7 col-10 mb-2">
+				<input [(ngModel)]="inputSearch" type="text" class="form-control" placeholder="Buscar por fecha, folio, cliente">
+			</div>
+			<div class="">
+				<button type="button" class="btn btn-primary mb-2 mr-3" (click)="search()">
+					<i class="fa fa-search mr-2"></i>
+				</button>
+			</div>
+		</div>
+	</h6>
+	<div class="card-body text-center">
+		<table class="table table-hover table-bordered" *ngIf="load">
+			<thead>
+				<tr>
+					<th scope="col">Fecha de venta</th>
+					<th scope="col">Folio</th>
+					<th scope="col">Cliente</th>
+					<th scope="col">Total de compra</th>
+					<th scope="col">Eliminar</th>
+				</tr>
+			</thead>
+			<ng-container *ngIf="data">
+				<tbody *ngIf="data.data.length; else elseBlock">
+					<tr *ngFor="let item of data.data" tooltip="Haz doble click para ver los detalles" (dblclick)="openModalProductView($event, templateViewSale, item)">
+						<td>{{item.created_at}}</td>
+						<td>VEN-{{item.id}}</td>
+						<td>{{item.client}}</td>
+						<td>${{item.total}}</td>
+						<td>
+							<button type="button" class="btn btn-danger" tooltip="Eliminar venta" (click)="openModalProductDelete(templateDeleteProduct, item.id)">
+								<i class="fa fa-trash"></i>
+							</button>
+						</td>
+					</tr>
+				</tbody>
+				<ng-template #elseBlock>
+					<tbody>
+						<tr>
+							<td colspan="5">Sin Ventas</td>
+						</tr>
+					</tbody>
+				</ng-template>
+				
+			</ng-container>
+
+		</table>
+
+		<div class="d-flex justify-content-center" *ngIf="!load">
+			<div class="spinner-border text-primary" role="status">
+				<span class="sr-only">Loading...</span>
+			</div>
+		</div>
+
+		<pagination *ngIf="data" style="float: right;" (pageChanged)="pageChanged($event)" [totalItems]="data.total" [itemsPerPage]="data.per_page" [maxSize]="3"></pagination>
+	</div>
+</div>
+
+<ng-template #templateDeleteProduct>
+	<div class="modal-body text-center">
+		<p>Seguro que deseas eliminar la venta?</p>
+		<button type="button" class="btn btn-default mr-3" (click)="confirm(bsModalRef.content.id)" >Si</button>
+		<button type="button" class="btn btn-primary" (click)="decline()" >No</button>
+	</div>
+</ng-template>
+
+<ng-template #templateViewSale>
+	<div class="modal-header">
+		<h4 class="modal-title pull-left h4">
+			Detalle de la venta
+		</h4>
+		<button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="modal-body">
+		<div>
+			<div class="d-flex justify-content-between">
+				<h6>Fecha: {{bsModalRef.content.sale.created_at}}</h6>
+				<h6>Folio: VEN-{{bsModalRef.content.sale.id}}</h6>
+				<h6>Cliente: {{bsModalRef.content.sale.client}}</h6>
+			</div>
+			<div class="text-center">
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th scope="col">Item</th>
+							<th scope="col">Nombre del producto</th>
+							<th scope="col">Precio</th>
+							<th scope="col">Cantidad</th>
+							<th scope="col">Importe</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr *ngFor="let product of bsModalRef.content.sale.products; index as i">
+							<th scope="row">{{1+i}}</th>
+							<td>{{product.name}}</td>
+							<td>${{product.price}}</td>
+							<td>{{product.pivot.quantity}}</td>
+							<td>${{product.pivot.amount}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="d-flex justify-content-end">
+				Total: $ <span>{{bsModalRef.content.sale.total}}</span>
+			</div>
+		</div>
+	</div>
+</ng-template>

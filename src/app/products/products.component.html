@@ -1,0 +1,127 @@
+<div class="card">
+	<h6 class="card-header" style="text-align: right;">
+		<button type="button" class="btn btn-primary" (click)="openModalSaveAndUpdateProduct(templateSaveAndUpdateProduct, null)">
+			<i class="fa fa-plus mr-2"></i>
+			Agregar Producto
+		</button>
+	</h6>
+	<div class="card-body text-center">
+		<table class="table table-hover table-bordered" *ngIf="load">
+			<thead>
+				<tr>
+					<th scope="col">Nombre del producto</th>
+					<th scope="col">Precio del producto</th>
+					<th colspan="2" scope="col">Acciones</th>
+				</tr>
+			</thead>
+			<ng-container *ngIf="products">
+				<tbody *ngIf="products.data.length; else elseBlock">
+					<tr *ngFor="let product of products.data" (click)="openModalProductView($event, templateViewProduct, product)">
+						<td>{{product.name}}</td>
+						<td>{{product.price}}</td>
+						<td>
+							<button type="button" class="btn btn-danger" tooltip="Eliminar producto" (click)="openModalProductDelete(templateDeleteProduct, product.id)">
+								<i class="fa fa-trash"></i>
+							</button>
+						</td>
+						<td>
+							<button type="button" class="btn btn-success" tooltip="Actualizar producto" (click)="openModalSaveAndUpdateProduct(templateSaveAndUpdateProduct, product)">
+								<i class="fa fa-refresh"></i>
+							</button>
+						</td>
+					</tr>
+				</tbody>
+				<ng-template #elseBlock>
+					<tbody>
+						<tr>
+							<td colspan="3">Sin Productos</td>
+						</tr>
+					</tbody>
+				</ng-template>
+				
+			</ng-container>
+		</table>
+
+		<div class="d-flex justify-content-center" *ngIf="!load">
+			<div class="spinner-border text-primary" role="status">
+				<span class="sr-only">Loading...</span>
+			</div>
+		</div>
+
+		<pagination *ngIf="products" style="float: right;" (pageChanged)="pageChanged($event)" [totalItems]="products.total" [itemsPerPage]="products.per_page" [maxSize]="3"></pagination>
+
+	</div>
+</div>
+
+<ng-template #templateDeleteProduct>
+	<div class="modal-body text-center">
+		<p>Seguro que deseas eliminar el producto?</p>
+		<button type="button" class="btn btn-default mr-3" (click)="confirm(bsModalRef.content.productId)" >Si</button>
+		<button type="button" class="btn btn-primary" (click)="decline()" >No</button>
+	</div>
+</ng-template>
+
+<ng-template #templateViewProduct>
+	<div class="modal-header">
+		<h4 class="modal-title pull-left h4">
+			{{bsModalRef.content.product.name}}
+		</h4>
+		<button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="modal-body">
+		<div class="text-center">
+			<img src="{{bsModalRef.content.product.img}}" class="img-fluid" alt="Responsive image" style=" 
+			height: 250px;">
+		</div>
+		<div class="text-right h6">
+			<i *ngIf="bsModalRef.content.product.visible" class="fa fa-eye mr-1"
+			tooltip="Producto visible."></i>
+			Precio: $<span class="h6">{{bsModalRef.content.product.price}}</span>
+		</div>
+	</div>
+</ng-template>
+
+<ng-template #templateSaveAndUpdateProduct>
+	<div class="modal-header">
+		<h4 class="modal-title pull-left">{{bsModalRef.content.actionBtnName}} producto</h4>
+		<button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="productForm">
+			<div class="form-group">
+				<label for="formGroupExampleInput">Nombre del producto</label>
+				<input type="text" class="form-control" formControlName="name" required placeholder="Este campo es requerido">
+			</div>
+			<div class="form-group">
+				<label for="formGroupExampleInput">Precio del producto</label>
+				<input type="text" class="form-control" formControlName="price" required placeholder="Este campo es requerido">
+			</div>
+			<div class="form-group">
+				<label for="exampleFormControlFile1">Imagen del producto</label>
+				<input type="file" (change)="onFileSelected($event)" class="form-control-file">
+			</div>
+			<div *ngIf="bsModalRef.content.actionBtnName == 'Actualizar'" class="form-check">
+				<input type="checkbox" class="form-check-input" formControlName="visible" >
+				<label class="form-check-label" for="exampleCheck1">Producto visible</label>
+			</div>
+			<div *ngIf="errors" class="alert alert-danger">
+				<div *ngFor="let item of errors | keyvalue">
+					{{item.value}}
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer">
+		<button *ngIf="bsModalRef.content.actionBtnName == 'Guardar'; else btnElse" type="button" class="btn btn-success mr-2" (click)="saveProduct()" [disabled]="productForm.status == 'INVALID'">{{bsModalRef.content.actionBtnName}}</button>
+		<ng-template #btnElse>
+			<button  type="button" class="btn btn-success mr-2" (click)="updateProduct(bsModalRef.content.idProduct)" [disabled]="productForm.status == 'INVALID'">{{bsModalRef.content.actionBtnName}}</button>
+		</ng-template>
+		
+		<button type="button" class="btn btn-default" (click)="bsModalRef.hide()">Cerrar</button>
+	</div>
+</ng-template>
+

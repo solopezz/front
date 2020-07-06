@@ -1,0 +1,29 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+  <span class="navbar-brand mb-0 h1">Tostadas el Zacatecano</span>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+</button>
+
+<div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+            <a class="nav-link" routerLink="/Productos" routerLinkActive="activeMenu">Productos<span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" routerLink="/Ventas" routerLinkActive="activeMenu">Ventas<span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" routerLink="/Historial" routerLinkActive="activeMenu">Historial de ventas<span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" routerLink="/Reporte" routerLinkActive="activeMenu">Reporte<span class="sr-only">(current)</span></a>
+        </li>
+    </ul>
+</div>
+</nav>
+<div class="container">
+  <div  *ngFor="let alert of alerts">
+      <alert [type]="alert.type" [dismissOnTimeout]="alert.timeout"><strong>{{alert.title}}</strong> {{alert.description}}</alert>
+  </div>
+  <router-outlet (activate)='onActivate($event)'></router-outlet>
+</div>
