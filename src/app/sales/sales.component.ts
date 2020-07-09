@@ -3,7 +3,7 @@ import * as moment from 'moment';
 import { SaleService } from "../services/sale.service";
 
 interface tempSales {
-	product_id:number;
+	id:number;
 	name: string;
 	price: number;
 	quantity: number;
@@ -67,7 +67,7 @@ export class SalesComponent implements OnInit {
 
 		let tmp = this.data.map(function(item) {
 			var rObj = {
-				product_id: item.product_id, 
+				product_id: item.id, 
 				quantity: item.quantity, 
 				amount: item.amount,
 			};
@@ -105,7 +105,7 @@ export class SalesComponent implements OnInit {
 	addProduct(){
 		this.changeProductInput = false;
 		let tmp = {
-			product_id: this.selectedProduct.id,
+			id: this.selectedProduct.id,
 			name: this.selectedProduct.name,
 			price: this.selectedProduct.price,
 			quantity: this.quantity,
